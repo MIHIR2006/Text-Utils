@@ -3,8 +3,9 @@ import Navbar from "./Components/Navbar";
 import TextForm from "./Components/TextForm";
 // import About from "./Components/About";
 import { useState } from "react";
-import Alert from "./Components/Alert";
 import About from "./Components/About";
+import Alert from "./Components/Alert";
+import Sql from "./Components/Sql";
 // import {
 //   BrowserRouter as Router,
 //   Routes,
@@ -52,9 +53,12 @@ function App() {
           title="TextUtils"
           aboutText="About TextUtiles"
           mode={mode}
-          toggleMode={toggleMode}
+          toggleMode={toggleMode} 
         />
         <Alert alert={alert} />
+
+        {/* <Card mode={mode}/> */}
+
         <div className="container my-3">
           {/* <Routes> */}
             {/* <Route exact path="/about" element={<About />} /> */}
@@ -63,7 +67,13 @@ function App() {
         
         </div>
       {/* </Router> */}
+
+
       <About mode={mode}/>
+
+      <Sql/>
+    
+      
     </>
   );
 }
