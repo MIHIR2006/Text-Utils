@@ -4,18 +4,26 @@ const cors = require('cors');
 const app = express();
 const PORT = 5000;
 
+// Set up CORS options
+const corsOptions = {
+    origin: ['http://localhost:3000', 'https://mihir2006.github.io/my-app/'], // Allow both local and production origins
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow these HTTP methods
+    credentials: true // Allow cookies if needed (optional)
+};
+
 // Middleware to parse JSON
 app.use(express.json());
 
-// Enable CORS for the frontend (React)
-app.use(cors());
+// Enable CORS for the frontend (React) using the corsOptions
+app.use(cors(corsOptions));
 
 // MySQL Database Connection
 const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root', // Replace with your MySQL user
-  password: 'your_password', // Replace with your MySQL password
-  database: 'your_database', // Replace with your database name
+    host: '127.0.0.1',           // MySQL Host (127.0.0.1 is the same as localhost)
+    port: 3306,                  // Default MySQL port
+    user: 'root',                // MySQL Username (root)
+    password: '2006',            // MySQL Password (replace with your MySQL password)
+  database: 'student', // Replace with your database name
 });
 
 db.connect(err => {
