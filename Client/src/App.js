@@ -71,7 +71,7 @@ function App() {
 
       <About mode={mode}/>
 
-      <Sql/>
+      <Sql mode={mode}/>
     
       
     </>

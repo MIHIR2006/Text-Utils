@@ -9,7 +9,7 @@ const corsOptions = {
     origin: ['http://localhost:3000', 'https://mihir2006.github.io/my-app/'], // Allow both local and production origins
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow these HTTP methods
     credentials: true // Allow cookies if needed (optional)
-};
+}
 
 // Middleware to parse JSON
 app.use(express.json());

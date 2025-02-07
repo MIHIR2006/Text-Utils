@@ -1,0 +1,13 @@
+
+.input-placeholder::placeholder {
+    opacity: 1; 
+  }
+  
+  .input-placeholder.dark-mode::placeholder {
+    color: white; /* For dark mode */
+  }
+  
+  .input-placeholder.light-mode::placeholder {
+    color: black; /* For light mode */
+  }
+  
