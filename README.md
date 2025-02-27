@@ -24,7 +24,7 @@ and many more, including code architecture and reusability
 
 1. Clone the repo
 ``` bash
-git clone https://github.com/MIHIR2006/my-app.git
+git clone https://github.com/MIHIR2006/Text-Utils.git
 ```
 
 2. Install dependencies
