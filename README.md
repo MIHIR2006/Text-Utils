@@ -14,6 +14,10 @@
 
 and many more, including code architecture and reusability 
 
+## Tech Stack
+
+[![Tech Stack](https://skillicons.dev/icons?i=react,express,mysql)](https://skillicons.dev)
+
 
 ## How to use
 
