@@ -226,7 +226,7 @@ function App(props) {
           className={`form-control mb-3 input-placeholder ${placeholderClass}`}
           value={inputText}
           onChange={handleInputChange}
-          placeholder="Enter natural language query (e.g., 'show students', 'add student')"
+          placeholder="Enter Query (e.g., 'show students', 'add student')"
           style={inputStyle}
         />
       </div>
@@ -240,7 +240,7 @@ function App(props) {
           Submit Query
         </button>
         <button
-          className="btn btn-success mx-2 my-1"
+          className="btn btn-dark mx-2 my-1"
           onClick={() => setShowCreateModal(true)}
         >
           Add New Student

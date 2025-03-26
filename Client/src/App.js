@@ -1,10 +1,10 @@
 import "./App.css";
 import Navbar from "./Components/Navbar";
-import TextForm from "./Components/TextForm";
+// import TextForm from "./Components/TextForm";
 // import About from "./Components/About";
 import { useState } from "react";
-import About from "./Components/About";
-import Alert from "./Components/Alert";
+// import About from "./Components/About";
+import Alert from "./Components/Alert";   
 import Sql from "./Components/Sql";
 // import {
 //   BrowserRouter as Router,
