@@ -51,7 +51,7 @@ function App() {
       {/* <Router> */}
         <Navbar
           title="TextUtils"
-          aboutText="About TextUtiles"
+          aboutText="About"
           mode={mode}
           toggleMode={toggleMode} 
         />
@@ -62,14 +62,18 @@ function App() {
         <div className="container my-3">
           {/* <Routes> */}
             {/* <Route exact path="/about" element={<About />} /> */}
-            {/* <Route exact  path="/" element={*/}<TextForm showAlert={showAlert} heading="TextUtils - Word counter,character counter,Remove extra Spaces     " mode={mode} />
+            {/* <Route exact  path="/" element={*/}
+            
+            {/* <TextForm showAlert={showAlert} heading="TextUtils - Word counter,character counter,Remove extra Spaces     " mode={mode} /> */}
+
+
           {/* </Routes> */}
         
         </div>
       {/* </Router> */}
 
 
-      <About mode={mode}/>
+      {/* <About mode={mode}/> */}
 
       <Sql mode={mode}/>
     

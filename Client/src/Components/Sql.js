@@ -1,7 +1,7 @@
-import React, { useState } from "react";
 import axios from "axios";
-import BootstrapTable from "react-bootstrap-table-next";
 import "bootstrap/dist/css/bootstrap.min.css";
+import React, { useState } from "react";
+import BootstrapTable from "react-bootstrap-table-next";
 import "./sql.css";
 
 function App(props) {
@@ -11,131 +11,156 @@ function App(props) {
   };
 
   const [inputText, setInputText] = useState("");
-  const [message, setMessage] = useState([]); // Initialize as an empty array
-  const [editId, setEditId] = useState(null); // Track the ID of the item being edited
-  const [editName, setEditName] = useState(""); // Track the name being edited
+  const [message, setMessage] = useState([]);
+  const [editId, setEditId] = useState(null);
+  const [editName, setEditName] = useState("");
+  const [editAge, setEditAge] = useState("");
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newStudent, setNewStudent] = useState({ name: "", age: "" });
+  const [error, setError] = useState("");
 
-  // Define placeholderClass based on the mode
   const placeholderClass = props.mode === "dark" ? "dark-mode" : "light-mode";
 
-  // Function to handle the input change
   const handleInputChange = (e) => {
     setInputText(e.target.value);
   };
 
-  // Function to handle editing input change
   const handleEditChange = (e) => {
     setEditName(e.target.value);
   };
 
-  // Function to fetch names from the API when text is 'Display Names'
-  const fetchNames = async () => {
-    const TB = [
-      "Mihir",
-      "barjraj",
-      "ramdin verma",
-      "sharat chandran",
-      "birender mandal",
-      "amit",
-      "kushal",
-      "kasid",
-      "shiv prakash",
-      "vikram Singh",
-      "sanjay",
-      "abhi",
-      "ram dutt gupta",
-      "khadak Singh",
-      "gurmit Singh",
-      "chanderpal",
-      "aman",
-      "khursid",
-      "rajeev",
-      "Mrugesh",
-      "nahar Singh",
-      "ram kumar",
-    ];
-    const NaturalRead = [
-      "display names",
-      "show employee names ",
-      "show names",
-      "display employee",
-      "show name",
-      "display name",
-      "list names",
-      "fetch names",
-      "get names",
-      "show me names",
-      "fetch name",
-      "display employee names",
-      "show employee names",
-    ];
+  const handleEditAgeChange = (e) => {
+    setEditAge(e.target.value);
+  };
 
-    const NaturalCreate = [
-      "create name",
-      "add name",
-      "insert name",
-      "add employee",
-      "create employee",
-      "insert employee",
-      "add new name",
-      "create new name",
-      "add a name",
-      "create new employee",
-      "insert new name",
-      "add new employee",
-      "create new record",
-      "insert employee name",
-    ];
+  const handleNewStudentChange = (e) => {
+    const { name, value } = e.target;
+    setNewStudent((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    setError(""); // Clear error when user types
+  };
 
-    const NaturalUpdate = [
-      "update name",
-      "edit name",
-      "modify name",
-      "update employee",
-      "change name",
-      "edit employee name",
-      "modify employee",
-      "update employee name",
-      "edit employee record",
-      "modify employee data",
-      "update employee record",
-      "change employee name",
-      "edit name record",
-      "update name details",
-    ];
+  // Function to fetch data from MySQL
+  const fetchData = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/read");
+      setMessage(response.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setError("Error fetching student data. Please try again.");
+    }
+  };
 
-    const NaturalDelete = [
-      "delete name",
-      "remove name",
-      "delete employee",
-      "remove employee",
-      "erase name",
-      "erase employee",
-    ];
-
-    if (NaturalRead.includes(inputText.toLowerCase())) {
-      setMessage(TB); // Set message to the TB array
-    } else if (NaturalCreate.includes(inputText.toLowerCase())) {
-      const newName = prompt("Enter the new employee name:");
-      if (newName) {
-        setMessage([...message, newName]); // Add new name to the list
+  // Function to create new record
+  const createRecord = async (name, age) => {
+    try {
+      // Validate inputs
+      if (!name.trim()) {
+        setError("Name cannot be empty");
+        return;
       }
-    } else if (NaturalUpdate.includes(inputText.toLowerCase())) {
-      const idToUpdate = prompt("Enter the ID of the employee to update:");
-      const newName = prompt("Enter the new name:");
-      if (idToUpdate && newName) {
-        const updatedMessage = message.map((name, index) =>
-          index + 1 === parseInt(idToUpdate) ? newName : name
-        );
-        setMessage(updatedMessage); // Update the name in the list
+      if (!age || age < 1 || age > 100) {
+        setError("Please enter a valid age (1-100)");
+        return;
       }
-    } else if (NaturalDelete.includes(inputText.toLowerCase())) {
-      const idToDelete = prompt("Enter the ID of the employee to delete:");
-      if (idToDelete) {
-        const updatedMessage = message.filter(
-          (name, index) => index + 1 !== parseInt(idToDelete)
-        );
-        setMessage(updatedMessage); // Remove the name from the list
+
+      await axios.post("http://localhost:5000/create", { name, age });
+      setShowCreateModal(false);
+      setNewStudent({ name: "", age: "" });
+      setError("");
+      fetchData(); // Refresh the data
+      alert("Student added successfully!");
+    } catch (error) {
+      console.error("Error creating record:", error);
+      setError("Error creating student record. Please try again.");
+    }
+  };
+
+  // Function to update record
+  const updateRecord = async (id, name, age) => {
+    try {
+      await axios.put("http://localhost:5000/update", { id, name, age });
+      fetchData(); // Refresh the data
+    } catch (error) {
+      console.error("Error updating record:", error);
+    }
+  };
+
+  // Function to delete record
+  const deleteRecord = async (id, name) => {
+    try {
+      // Show confirmation dialog only once
+      const isConfirmed = window.confirm(
+        `Are you sure you want to delete student "${name}"?`
+      );
+
+      if (isConfirmed) {
+        await axios.delete("http://localhost:5000/delete", { data: { id } });
+        await fetchData(); // Refresh the data
+        alert("Student deleted successfully!");
+      }
+    } catch (error) {
+      console.error("Error deleting record:", error);
+      alert("Error deleting student. Please try again.");
+    }
+  };
+
+  // Natural language query processing
+  const processQuery = async () => {
+    const query = inputText.toLowerCase();
+
+    // Read operations
+    if (
+      query.includes("show") ||
+      query.includes("display") ||
+      query.includes("list") ||
+      query.includes("fetch") ||
+      query.includes("get")
+    ) {
+      await fetchData();
+    }
+    // Create operations
+    else if (
+      query.includes("add") ||
+      query.includes("create") ||
+      query.includes("insert")
+    ) {
+      const name = prompt("Enter student name:");
+      const age = prompt("Enter student age:");
+      if (name && age) {
+        await createRecord(name, parseInt(age));
+      }
+    }
+    // Update operations
+    else if (
+      query.includes("update") ||
+      query.includes("edit") ||
+      query.includes("modify")
+    ) {
+      const id = prompt("Enter student ID to update:");
+      const name = prompt("Enter new name:");
+      const age = prompt("Enter new age:");
+      if (id && name && age) {
+        await updateRecord(parseInt(id), name, parseInt(age));
+      }
+    }
+    // Delete operations
+    else if (
+      query.includes("delete") ||
+      query.includes("remove") ||
+      query.includes("erase")
+    ) {
+      const id = prompt("Enter student ID to delete:");
+      if (id) {
+        // Find the student name for the confirmation message
+        const student = message.find((s) => s.id === parseInt(id));
+        if (student) {
+          await deleteRecord(parseInt(id), student.name);
+        } else {
+          alert("Student not found!");
+        }
       }
     }
   };
@@ -148,7 +173,12 @@ function App(props) {
     },
     {
       dataField: "name",
-      text: "Employee Name",
+      text: "Student Name",
+      sort: true,
+    },
+    {
+      dataField: "age",
+      text: "Age",
       sort: true,
     },
     {
@@ -161,18 +191,14 @@ function App(props) {
             onClick={() => {
               setEditId(row.id);
               setEditName(row.name);
+              setEditAge(row.age);
             }}
           >
             Edit
           </button>
           <button
             className="btn btn-danger btn-sm mx-1"
-            onClick={() => {
-              const updatedMessage = message.filter(
-                (name, index) => index + 1 !== row.id
-              );
-              setMessage(updatedMessage);
-            }}
+            onClick={() => deleteRecord(row.id, row.name)}
           >
             Delete
           </button>
@@ -181,20 +207,18 @@ function App(props) {
     },
   ];
 
-  // Ensure message is an array before mapping
-  const data = Array.isArray(message)
-    ? message.map((name, index) => ({
-        id: index + 1, // Use index + 1 to start IDs from 1
-        name: name,
-      }))
-    : [];
+  const data = message.map((student) => ({
+    id: student.id,
+    name: student.name,
+    age: student.age,
+  }));
 
   return (
     <div
       className="container my-3"
       style={{ color: props.mode === "dark" ? "white" : "black" }}
     >
-      <h1 className="mb-4">Employee Names</h1>
+      <h1 className="mb-4">Student Management System</h1>
 
       <div className="form-group">
         <input
@@ -202,18 +226,104 @@ function App(props) {
           className={`form-control mb-3 input-placeholder ${placeholderClass}`}
           value={inputText}
           onChange={handleInputChange}
-          placeholder="Type 'Display Names' to fetch data"
+          placeholder="Enter natural language query (e.g., 'show students', 'add student')"
           style={inputStyle}
         />
       </div>
 
-      <button
-        disabled={inputText.length === 0}
-        className="btn btn-primary mb-3 mx-2 my-1"
-        onClick={fetchNames}
-      >
-        Submit
-      </button>
+      <div className="mb-3">
+        <button
+          disabled={inputText.length === 0}
+          className="btn btn-primary mx-2 my-1"
+          onClick={processQuery}
+        >
+          Submit Query
+        </button>
+        <button
+          className="btn btn-success mx-2 my-1"
+          onClick={() => setShowCreateModal(true)}
+        >
+          Add New Student
+        </button>
+      </div>
+
+      {/* Create Student Modal */}
+      {showCreateModal && (
+        <div
+          className="modal show d-block"
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Add New Student</h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => {
+                    setShowCreateModal(false);
+                    setNewStudent({ name: "", age: "" });
+                    setError("");
+                  }}
+                ></button>
+              </div>
+              <div className="modal-body">
+                {error && <div className="alert alert-danger">{error}</div>}
+                <div className="mb-3">
+                  <label htmlFor="name" className="form-label">
+                    Student Name
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="name"
+                    name="name"
+                    value={newStudent.name}
+                    onChange={handleNewStudentChange}
+                    placeholder="Enter student name"
+                  />
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="age" className="form-label">
+                    Age
+                  </label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    id="age"
+                    name="age"
+                    value={newStudent.age}
+                    onChange={handleNewStudentChange}
+                    placeholder="Enter student age"
+                  />
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => {
+                    setShowCreateModal(false);
+                    setNewStudent({ name: "", age: "" });
+                    setError("");
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() =>
+                    createRecord(newStudent.name, parseInt(newStudent.age))
+                  }
+                >
+                  Add Student
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {editId && (
         <div className="my-3">
@@ -222,17 +332,22 @@ function App(props) {
             className="form-control mb-2"
             value={editName}
             onChange={handleEditChange}
-            placeholder="Edit employee name"
+            placeholder="Edit student name"
+          />
+          <input
+            type="number"
+            className="form-control mb-2"
+            value={editAge}
+            onChange={handleEditAgeChange}
+            placeholder="Edit student age"
           />
           <button
             className="btn btn-success btn-sm mx-1"
             onClick={() => {
-              const updatedMessage = message.map((name, index) =>
-                index + 1 === editId ? editName : name
-              );
-              setMessage(updatedMessage);
+              updateRecord(editId, editName, parseInt(editAge));
               setEditId(null);
               setEditName("");
+              setEditAge("");
             }}
           >
             Save
@@ -242,6 +357,7 @@ function App(props) {
             onClick={() => {
               setEditId(null);
               setEditName("");
+              setEditAge("");
             }}
           >
             Cancel
@@ -249,7 +365,8 @@ function App(props) {
         </div>
       )}
 
-      {Array.isArray(message) && message.length > 0 && (
+      {/* Only render table when there is data */}
+      {message.length > 0 && (
         <div style={{ color: props.mode === "dark" ? "white" : "black" }}>
           <BootstrapTable
             keyField="id"
@@ -262,9 +379,21 @@ function App(props) {
             headerClasses={
               props.mode === "dark" ? "table-primary" : "table-primary"
             }
-            wrapperClasses={props.mode === "dark" ? "table-dark" : "table-light"}
+            wrapperClasses={
+              props.mode === "dark" ? "table-dark" : "table-light"
+            }
             rowClasses={props.mode === "dark" ? "table-dark" : "table-light"}
           />
+        </div>
+      )}
+
+      {/* Show a message when no data is available */}
+      {message.length === 0 && (
+        <div className="text-center mt-4">
+          <p>
+            No data to display. Use the search bar above or click "Add New
+            Student" to get started.
+          </p>
         </div>
       )}
     </div>
